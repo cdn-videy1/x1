@@ -34,18 +34,24 @@
         }
 
         .continue-text {
-            font-size: 18px;
-            color: #aaa;
+            font-size: 22px;
+            font-weight: bold; /* Teks tebal */
+            text-transform: uppercase; /* Huruf kapital semua */
+            background-color: #ffe600; /* Background kuning */
+            color: #ff0000; /* Teks merah */
             cursor: pointer;
             text-decoration: none;
-            padding: 20px;
-            transition: color 0.3s ease;
+            padding: 20px 40px;
+            border-radius: 12px; /* Sudut melengkung */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             user-select: none;
+            box-shadow: 0 5px 20px rgba(255, 230, 0, 0.2); /* Efek cahaya kuning di belakangnya */
+            text-align: center;
         }
 
         .continue-text:hover {
-            color: #fff;
-            text-decoration: underline;
+            transform: scale(1.05); /* Membesar sedikit saat diarahkan kursor */
+            box-shadow: 0 8px 25px rgba(255, 230, 0, 0.4);
         }
 
         /* --- STYLING VIDEO PLAYER --- */
@@ -138,23 +144,28 @@
 </head>
 <body>
 
+    <!-- HALAMAN UTAMA (Tombol Teks) -->
     <div id="splashScreen">
         <span class="continue-text" onclick="showPlayer()">Lanjutkan untuk menonton tanpa iklan</span>
     </div>
 
+    <!-- HALAMAN PLAYER (Awalnya Tersembunyi) -->
     <div id="playerScreen">
         
+        <!-- Form input jika tidak ada ID di URL -->
         <div class="input-box" id="inputForm">
             <input type="text" id="videyInput" placeholder="Masukkan ID Videy (contoh: ANdnV2BS1)">
             <button onclick="loadVideoFromInput()">Tonton</button>
         </div>
 
+        <!-- Video Player -->
         <div class="video-wrapper">
             <video id="videoPlayer" controls playsinline preload="metadata">
                 Browser Anda tidak mendukung HTML5 video.
             </video>
         </div>
 
+        <!-- Tombol Aksi -->
         <div class="action-bar" id="actionBar" style="display: none;">
             <span class="video-id-text" id="videoTitle">ID: -</span>
             <a id="downloadBtn" href="#" download class="btn" target="_blank">Download Video</a>
@@ -165,7 +176,6 @@
     <script>
         let currentVideoId = null;
 
-        // Ambil ID dari URL saat halaman dimuat
         function getVideoIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             let id = urlParams.get('id');
@@ -176,23 +186,18 @@
             return id;
         }
 
-        // Transisi dari Halaman Utama ke Player
         function showPlayer() {
-            // Sembunyikan teks utama, tampilkan player
             document.getElementById('splashScreen').style.display = 'none';
             document.getElementById('playerScreen').style.display = 'block';
 
-            // Jika ada ID di URL, langsung putar videonya
             if (currentVideoId) {
                 playVideo(currentVideoId);
             }
         }
 
-        // Fungsi memuat dan memutar video
         function playVideo(id) {
             if (!id) return;
 
-            // Bersihkan format ID
             id = id.replace('https://cdn.videy.co/', '')
                    .replace('https://videy.co/v?id=', '')
                    .replace('.mp4', '')
@@ -201,20 +206,17 @@
             const cdnUrl = `https://cdn.videy.co/${id}.mp4`;
             const videoPlayer = document.getElementById('videoPlayer');
             
-            // Set source
             videoPlayer.src = cdnUrl;
             document.getElementById('downloadBtn').href = cdnUrl;
             document.getElementById('videoTitle').innerText = `ID: ${id}`;
             document.getElementById('actionBar').style.display = 'flex';
 
-            // Load dan otomatis putar video (karena pengguna sudah mengklik tombol sebelumnya)
             videoPlayer.load();
             videoPlayer.play().catch(e => {
-                console.log("Autoplay diblokir oleh browser. Pengguna harus menekan tombol play manual.");
+                console.log("Autoplay diblokir. Putar manual.");
             });
         }
 
-        // Fungsi memutar video dari input manual
         function loadVideoFromInput() {
             const inputVal = document.getElementById('videyInput').value;
             if (inputVal) {
@@ -224,7 +226,6 @@
             }
         }
 
-        // Simpan ID saat halaman pertama kali dibuka
         window.addEventListener('DOMContentLoaded', () => {
             currentVideoId = getVideoIdFromUrl();
         });
