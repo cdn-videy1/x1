@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
-    
-    <meta name="description" content="Tonton video ini">
+    <title>Videy Player</title>
     
     <style>
         /* Reset margin dan setup background gelap ala Videy */
@@ -14,66 +12,194 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #0f0f0f; /* Warna hitam gelap */
+            background-color: #0f0f0f;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
         }
 
-        /* Container untuk membatasi ukuran maksimal video */
-        .video-wrapper {
+        /* Container utama */
+        .container {
             width: 100%;
-            max-width: 900px; /* Lebar maksimal video di PC */
-            padding: 15px;
+            max-width: 800px;
+            padding: 20px;
             box-sizing: border-box;
+            text-align: center;
         }
 
-        /* Styling video player */
+        /* Form input jika ID tidak ditemukan di URL */
+        .input-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .input-box input {
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            color: #fff;
+            width: 60%;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .input-box button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            background-color: #2563eb;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .input-box button:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Styling Video Player */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+
         video {
             width: 100%;
-            height: auto;
-            border-radius: 8px; /* Membuat sudut video sedikit melengkung */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Efek bayangan */
-            background-color: #000; /* Antisipasi jika video loading */
+            max-height: 80vh;
+            display: block;
             outline: none;
         }
 
-        /* Tombol download opsional di bawah video */
+        /* Baris tombol aksi di bawah video */
         .action-bar {
             margin-top: 15px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .btn-download {
+        .video-id-text {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .btn {
             background-color: #272727;
             color: #fff;
             text-decoration: none;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: 20px;
             font-size: 14px;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s;
+            display: inline-block;
         }
 
-        .btn-download:hover {
+        .btn:hover {
             background-color: #3f3f3f;
+        }
+
+        /* Pesan error jika ID salah/video tidak ada */
+        .error-message {
+            color: #ef4444;
+            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="video-wrapper">
-        <video controls playsinline preload="metadata">
-            <source src="nama-video.mp4" type="video/mp4">
-            
-            Browser Anda tidak mendukung pemutar video HTML5.
-        </video>
+    <div class="container">
 
-        <div class="action-bar">
-            <a href="nama-video.mp4" download class="btn-download">Download</a>
+        <div class="input-box" id="inputForm">
+            <input type="text" id="videyInput" placeholder="Masukkan ID Videy (contoh: ANdnV2BS1)">
+            <button onclick="loadVideoFromInput()">Tonton</button>
         </div>
+
+        <div class="video-wrapper">
+            <video id="videoPlayer" controls playsinline preload="metadata">
+                Browser Anda tidak mendukung HTML5 video.
+            </video>
+        </div>
+
+        <div class="action-bar" id="actionBar" style="display: none;">
+            <span class="video-id-text" id="videoTitle">ID: -</span>
+            <a id="downloadBtn" href="#" download class="btn" target="_blank">Download Video</a>
+        </div>
+
+        <p class="error-message" id="errorMessage">Video tidak ditemukan atau ID tidak valid.</p>
     </div>
 
+    <script>
+        // Fungsi untuk mengambil parameter ID dari URL
+        function getVideoIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let id = urlParams.get('id');
+
+            // Fallback: Cek jika ID ditaruh setelah tanda pagar (#ANdnV2BS1)
+            if (!id && window.location.hash) {
+                id = window.location.hash.substring(1);
+            }
+
+            return id;
+        }
+
+        // Fungsi untuk memuat video berdasarkan ID
+        function playVideo(id) {
+            if (!id) return;
+
+            // Bersihkan ID jika pengguna memasukkan URL lengkap atau akhiran .mp4
+            id = id.replace('https://cdn.videy.co/', '')
+                   .replace('https://videy.co/v?id=', '')
+                   .replace('.mp4', '')
+                   .trim();
+
+            const cdnUrl = `https://cdn.videy.co/${id}.mp4`;
+            const videoPlayer = document.getElementById('videoPlayer');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const videoTitle = document.getElementById('videoTitle');
+            const actionBar = document.getElementById('actionBar');
+
+            // Set source video dan tombol download
+            videoPlayer.src = cdnUrl;
+            downloadBtn.href = cdnUrl;
+            videoTitle.innerText = `ID: ${id}`;
+
+            // Tampilkan baris aksi
+            actionBar.style.display = 'flex';
+
+            // Coba putar video
+            videoPlayer.load();
+        }
+
+        // Fungsi jika pengguna mengetik ID di input box
+        function loadVideoFromInput() {
+            const inputVal = document.getElementById('videyInput').value;
+            if (inputVal) {
+                // Ubah URL tanpa mereload halaman seluruhnya
+                const cleanId = inputVal.replace('https://cdn.videy.co/', '').replace('.mp4', '').trim();
+                window.history.pushState({}, '', `?id=${cleanId}`);
+                playVideo(cleanId);
+            }
+        }
+
+        // Jalankan saat halaman dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            const videoId = getVideoIdFromUrl();
+
+            if (videoId) {
+                playVideo(videoId);
+            }
+        });
+    </script>
 </body>
 </html>
