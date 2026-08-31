@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    
+    <meta name="description" content="Tonton video ini">
+    
+    <style>
+        /* Reset margin dan setup background gelap ala Videy */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f0f0f; /* Warna hitam gelap */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Container untuk membatasi ukuran maksimal video */
+        .video-wrapper {
+            width: 100%;
+            max-width: 900px; /* Lebar maksimal video di PC */
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Styling video player */
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 8px; /* Membuat sudut video sedikit melengkung */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Efek bayangan */
+            background-color: #000; /* Antisipasi jika video loading */
+            outline: none;
+        }
+
+        /* Tombol download opsional di bawah video */
+        .action-bar {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-download {
+            background-color: #272727;
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-download:hover {
+            background-color: #3f3f3f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-wrapper">
+        <video controls playsinline preload="metadata">
+            <source src="nama-video.mp4" type="video/mp4">
+            
+            Browser Anda tidak mendukung pemutar video HTML5.
+        </video>
+
+        <div class="action-bar">
+            <a href="nama-video.mp4" download class="btn-download">Download</a>
+        </div>
+    </div>
+
+</body>
+</html>
